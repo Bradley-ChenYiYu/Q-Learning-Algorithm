@@ -231,9 +231,18 @@ class Agent:
                         mx_nxt_value = nxt_value
                 q_values[i, j] = mx_nxt_value
 
-        plt.imshow(q_values, cmap='viridis', interpolation='nearest')
+        plt.imshow(q_values, cmap='viridis', interpolation='nearest', 
+            vmin=-7, vmax=1)
         plt.colorbar(label='Max Q-value')
-        plt.title('Q-table Heatmap')
+        
+        # Add text annotations for Q-values
+        for i in range(BOARD_ROWS):
+            for j in range(BOARD_COLS):
+                plt.text(j, i, f'{q_values[i, j]:.2f}', 
+                        ha='center', va='center', color='white', fontsize=8)
+
+        # Set the title and labels              
+        plt.title('Q-table Heatmap - Episode ' + str(episode))
         plt.xlabel('Column')
         plt.ylabel('Row')
         plt.xticks(range(BOARD_COLS))
