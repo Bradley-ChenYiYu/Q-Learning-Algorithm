@@ -138,7 +138,7 @@ class Agent:
     
     
     #Q-learning Algorithm
-    def Q_Learning(self,episodes):
+    def Q_Learning(self,episodes, plot_freq=10):
         x = 0
         #iterate through best path for each episode
         while(x < episodes):
@@ -153,14 +153,19 @@ class Agent:
                 i,j = self.State.state
                 for a in self.actions:
                     self.new_Q[(i,j,a)] = round(reward,3)
-                    
+                
+                # Plot current Q table every {plot_freq} episodes
+                if x % plot_freq == 0 and x <= 100:
+                    print(f'Episode {x}, Total Reward: {self.rewards}')
+                    self.plot_q_table(episode=x)
+                
                 #reset state
                 self.State = State()
                 self.isEnd = self.State.isEnd
                 
                 #set rewards to zero and iterate to next episode
                 self.rewards = 0
-                x+=1
+                x+=1                
             else:
                 #set to arbitrary low value to compare net state actions
                 mx_nxt_value = -10
@@ -214,7 +219,30 @@ class Agent:
                 out += str(mx_nxt_value).ljust(6) + ' | '
             print(out)
         print('-----------------------------------------------')
+    
+    def plot_q_table(self, episode):
+        q_values = np.zeros((BOARD_ROWS, BOARD_COLS))
+        for i in range(BOARD_ROWS):
+            for j in range(BOARD_COLS):
+                mx_nxt_value = -10
+                for a in self.actions:
+                    nxt_value = self.Q[(i, j, a)]
+                    if nxt_value >= mx_nxt_value:
+                        mx_nxt_value = nxt_value
+                q_values[i, j] = mx_nxt_value
+
+        plt.imshow(q_values, cmap='viridis', interpolation='nearest')
+        plt.colorbar(label='Max Q-value')
+        plt.title('Q-table Heatmap')
+        plt.xlabel('Column')
+        plt.ylabel('Row')
+        plt.xticks(range(BOARD_COLS))
+        plt.yticks(range(BOARD_ROWS))
         
+        # plt.show()
+        # Save the plot with the episode number in the filename
+        plt.savefig(f'Images/results/q_table_heatmap_episode_{episode}.png')
+        plt.close()
     
         
 if __name__ == "__main__":
@@ -222,5 +250,5 @@ if __name__ == "__main__":
     ag = Agent()
     episodes = 10000
     ag.Q_Learning(episodes)
-    ag.plot(episodes)
+    # ag.plot(episodes)
     ag.showValues()
