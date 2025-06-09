@@ -221,15 +221,11 @@ class Agent:
         print('-----------------------------------------------')
     
     def plot_q_table(self, episode):
-        q_values = np.zeros((BOARD_ROWS, BOARD_COLS))
-        for i in range(BOARD_ROWS):
-            for j in range(BOARD_COLS):
-                mx_nxt_value = -10
-                for a in self.actions:
-                    nxt_value = self.Q[(i, j, a)]
-                    if nxt_value >= mx_nxt_value:
-                        mx_nxt_value = nxt_value
-                q_values[i, j] = mx_nxt_value
+        # Convert Q dictionary to 3D array and take max along action axis
+        q_array = np.array([[[self.Q[(i, j, a)] for a in self.actions] 
+                            for j in range(BOARD_COLS)] 
+                           for i in range(BOARD_ROWS)])
+        q_values = np.max(q_array, axis=2)
 
         plt.imshow(q_values, cmap='viridis', interpolation='nearest', 
             vmin=-7, vmax=1)
